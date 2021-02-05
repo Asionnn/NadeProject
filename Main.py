@@ -39,19 +39,15 @@ if __name__ == "__main__":
                 run = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
-                    print(time.time());
                     draw_rect_alpha(window, (100, 100, 100), leftRect)
                     pygame.display.update()
                     pygame.time.wait(300)
                     draw_rect_alpha(window, (0, 0, 0), leftRect)
                 if event.key == pygame.K_d:
-                    print(time.time())
                     draw_rect_alpha(window, (100, 100, 100), rightRect)
                     pygame.display.update()
                     pygame.time.wait(300)
                     draw_rect_alpha(window, (0, 0, 0), rightRect)
-                    window.fill(black)
-                    pygame.display.flip()
 
         x = random.randint(10 + r, window.get_width() - r - 10)
         y = random.randint(10 + r, window.get_height() - r - 10)
