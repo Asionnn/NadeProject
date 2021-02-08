@@ -98,34 +98,40 @@ if __name__ == "__main__":
 
     draw_circles()
     start = time.time()
-    interval = random.randint(3000, 5000)/1000
+    interval = random.randint(3000, 5000)
     elapsed = 0
+
+    INTERVAL_EXCEEDED = pygame.USEREVENT + 1
+    pygame.time.set_timer(INTERVAL_EXCEEDED, interval, True)
+
+    key_pressed = False
+
+    start_tic = pygame.time.get_ticks()
 
     while run:
         r = 20
+        if pygame.event.get(INTERVAL_EXCEEDED):
+            print("interval: " + str(interval))
+            print(time.time() - start)
+            key_pressed = False
+            interval = random.randint(3000, 5000)
+            pygame.time.set_timer(INTERVAL_EXCEEDED, interval, True)
+            start = time.time()
+            start_tic = pygame.time.get_ticks()
+            reset_circles()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             elif event.type == pygame.KEYDOWN:
-                keyPressed = True
+                key_pressed = True
+                start = time.time()
+                start_tic = pygame.time.get_ticks()
+                interval = random.randint(3000, 5000)
                 if event.key == pygame.K_a:
                     highlight_screen(leftRect)
-                    print((time.time() - start))
-                    start = time.time()
-                    interval = random.randint(3000, 5000)/1000
                 if event.key == pygame.K_d:
                     highlight_screen(rightRect)
-                    print((time.time() - start))
-                    start = time.time()
-                    interval = random.randint(3000, 5000)/1000
-            elif elapsed > interval:
-                length = time.time() - start
-                interval = random.randint(3000, 5000)/1000
-                reset_circles()
-                start = time.time()
-
-            elapsed = time.time() - start
-            pygame.display.update()
 
         pygame.display.flip()
 
