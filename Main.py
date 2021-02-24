@@ -10,6 +10,7 @@ black = [0, 0, 0]
 reset = False
 timer_status = 0
 
+
 def generate_circle_lists():
     global circle_list
     global circles
@@ -78,7 +79,7 @@ def highlight_screen(rect):
     global black
     draw_rect_alpha(window, (100, 100, 100), rect)
     pygame.display.update()
-    pygame.time.wait(200)
+    pygame.time.wait(100)
     draw_rect_alpha(window, (0, 0, 0), rect)
     reset_circles()
 
@@ -105,48 +106,37 @@ if __name__ == "__main__":
     INTERVAL_EXCEEDED = pygame.USEREVENT + 1
     pygame.time.set_timer(INTERVAL_EXCEEDED, interval, True)
 
-    start_tic = pygame.time.get_ticks()
-
     print("initial start: " + str(start))
     print("initial interval: " + str(interval))
 
-
     while run:
-        r = 20
-        if pygame.event.get(INTERVAL_EXCEEDED) and not reset:
+        if pygame.event.get(INTERVAL_EXCEEDED):
             print("interval: " + str(interval))
             print("time: " + str(time.time() - start))
+            reset_circles()
 
+            pygame.event.clear()
             interval = random.randint(3000, 5000)
             pygame.time.set_timer(INTERVAL_EXCEEDED, interval, True)
-            start_tic = pygame.time.get_ticks()
-            reset_circles()
+
             start = time.time()
             timer_status = 0
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            elif event.type == pygame.KEYDOWN:
-                print(timer_status)
-                timer_status = 1
-                interval = random.randint(3000, 5000)
-                key_pressed = True
+            if event.type == pygame.KEYDOWN:
+                pygame.event.clear()
                 if event.key == pygame.K_a:
                     highlight_screen(leftRect)
                 if event.key == pygame.K_d:
                     highlight_screen(rightRect)
 
-                start_tic = pygame.time.get_ticks()
-                # print("New interval: " + str(interval))
-
-                if timer_status == 1:
-                    pygame.time.set_timer(INTERVAL_EXCEEDED, 0, True)
-                    reset = True
-                    pygame.time.set_timer(INTERVAL_EXCEEDED, interval, True)
-                    reset = False
+                interval = random.randint(3000, 5000)
+                pygame.time.set_timer(INTERVAL_EXCEEDED, interval, True)
 
                 start = time.time()
+
 
         pygame.display.flip()
 
