@@ -3,12 +3,10 @@ import pygame
 import time
 import random
 
-circles = 0
-runOnce = True
 circle_list = []
 black = [0, 0, 0]
-reset = False
-timer_status = 0
+circles = 0
+runOnce = True
 
 
 def generate_circle_lists():
@@ -85,7 +83,9 @@ def highlight_screen(rect):
 
 
 if __name__ == "__main__":
+    run = True
 
+    # Initialize pygame
     pygame.init()
     window = pygame.display.set_mode([1024, 768])
     generate_circle_lists()
@@ -93,34 +93,25 @@ if __name__ == "__main__":
     font50 = pygame.font.SysFont(None, 50)
     window.fill(black)
 
-    run = True
-
+    # Draw opaque rectandles for left and right sides
     leftRect = pygame.draw.rect(window, (0, 0, 0), (0, 0, 512, 768), 1)
     rightRect = pygame.draw.rect(window, (0, 0, 0), (512, 0, 512, 768), 1)
 
+    # Render circles and set up interval
     draw_circles()
-    start = time.time()
     interval = random.randint(3000, 5000)
-    elapsed = 0
 
-    INTERVAL_EXCEEDED = pygame.USEREVENT + 1
-    pygame.time.set_timer(INTERVAL_EXCEEDED, interval, True)
-
-    print("initial start: " + str(start))
-    print("initial interval: " + str(interval))
+    # Keep track of the game time
+    game_start_time = time.time()
+    start_time = time.time()
 
     while run:
-        if pygame.event.get(INTERVAL_EXCEEDED):
+        if (time.time() - start_time) * 1000 >= interval:
             print("interval: " + str(interval))
-            print("time: " + str(time.time() - start))
-            reset_circles()
-
-            pygame.event.clear()
+            print("time: " + str(time.time() - start_time))
             interval = random.randint(3000, 5000)
-            pygame.time.set_timer(INTERVAL_EXCEEDED, interval, True)
-
-            start = time.time()
-            timer_status = 0
+            start_time = time.time()
+            reset_circles()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -133,10 +124,7 @@ if __name__ == "__main__":
                     highlight_screen(rightRect)
 
                 interval = random.randint(3000, 5000)
-                pygame.time.set_timer(INTERVAL_EXCEEDED, interval, True)
-
-                start = time.time()
-
+                start_time = time.time()
 
         pygame.display.flip()
 
