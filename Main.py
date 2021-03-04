@@ -87,6 +87,7 @@ def highlight_screen(rect, side):
     pygame.time.wait(100)
     draw_rect_alpha(window, (0, 0, 0), rect)
 
+    # Record correct or wrong answer
     if side == correct_circle_location[random_circle_index]:
         print("Correct")
     else:
@@ -136,6 +137,7 @@ if __name__ == "__main__":
                 if event.key == pygame.K_d:
                     highlight_screen(rightRect, 1)
 
+                # Record the time taken and/or the unix time
                 print("time taken: " + str(time.time() - start_time))
 
                 interval = random.randint(3000, 5000)
