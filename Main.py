@@ -4,8 +4,10 @@ import time
 import random
 
 circle_list = []
+correct_circle_location = []
 black = [0, 0, 0]
 circles = 0
+random_circle_index = 0
 runOnce = True
 
 
@@ -33,6 +35,11 @@ def generate_circle_lists():
             if not any((x2, y2, r2) and not runOnce
                        for x2, y2, r2 in trial if euclidean_distance(x, y, x2, y2) < r + r2) and runOnce:
                 trial.append((x, y, r))
+                if x <= 512:
+                    correct_circle_location.append(0)
+                else:
+                    correct_circle_location.append(1)
+
                 runOnce = False
         circle_list.append(trial)
         num_generated = num_generated + 1
@@ -60,9 +67,9 @@ def reset_variables():
 
 
 def draw_circles():
-
-    index = random.randint(0, 100)
-    for x, y, r in circle_list[index]:
+    global random_circle_index
+    random_circle_index = random.randint(0, 100)
+    for x, y, r in circle_list[random_circle_index]:
         pygame.draw.circle(window, (255, 255, 255), (round(x), round(y)), int(r), 1)
     pygame.display.flip()
 
@@ -73,12 +80,18 @@ def reset_circles():
     draw_circles()
 
 
-def highlight_screen(rect):
-    global black
+def highlight_screen(rect, side):
+    global black, correct_circle_location, random_circle_index
     draw_rect_alpha(window, (100, 100, 100), rect)
     pygame.display.update()
     pygame.time.wait(100)
     draw_rect_alpha(window, (0, 0, 0), rect)
+
+    if side == correct_circle_location[random_circle_index]:
+        print("Correct")
+    else:
+        print("Wrong")
+
     reset_circles()
 
 
@@ -119,9 +132,11 @@ if __name__ == "__main__":
             if event.type == pygame.KEYDOWN:
                 pygame.event.clear()
                 if event.key == pygame.K_a:
-                    highlight_screen(leftRect)
+                    highlight_screen(leftRect, 0)
                 if event.key == pygame.K_d:
-                    highlight_screen(rightRect)
+                    highlight_screen(rightRect, 1)
+
+                print("time taken: " + str(time.time() - start_time))
 
                 interval = random.randint(3000, 5000)
                 start_time = time.time()
