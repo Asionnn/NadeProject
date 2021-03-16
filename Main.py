@@ -2,11 +2,19 @@ import math
 import pygame
 import time
 import random
+from datetime import datetime
+import csv
 
+# structure for data = (trial #, side, correct?, reaction time, unix time)
+data = []
 circle_list = []
 correct_circle_location = []
+fields = ['Trial #', 'Side', 'Correct?', 'Reaction Time', 'UNIX Time Stamp']
 black = [0, 0, 0]
+date = datetime.today().strftime('%y%m%d%H%M%S')
+filename = 'Data' + date + '.csv'
 circles = 0
+trial_count = 1
 random_circle_index = 0
 runOnce = True
 
@@ -42,7 +50,7 @@ def generate_circle_lists():
 
                 runOnce = False
         circle_list.append(trial)
-        num_generated = num_generated + 1
+        num_generated += 1
         circles = 0
         runOnce = True
 
@@ -57,15 +65,6 @@ def draw_rect_alpha(surface, color, rect):
     surface.blit(shape_surf, rect)
 
 
-def reset_variables():
-    global circles
-    global runOnce
-    global circle_list
-
-    circles = 0
-    runOnce = True
-
-
 def draw_circles():
     global random_circle_index
     random_circle_index = random.randint(0, 100)
@@ -76,24 +75,28 @@ def draw_circles():
 
 def reset_circles():
     window.fill(black)
-    reset_variables()
     draw_circles()
 
 
-def highlight_screen(rect, side):
-    global black, correct_circle_location, random_circle_index
+def highlight_screen(rect):
+    global correct_circle_location, random_circle_index
     draw_rect_alpha(window, (100, 100, 100), rect)
     pygame.display.update()
     pygame.time.wait(100)
     draw_rect_alpha(window, (0, 0, 0), rect)
-
-    # Record correct or wrong answer
-    if side == correct_circle_location[random_circle_index]:
-        print("Correct")
-    else:
-        print("Wrong")
-
     reset_circles()
+
+
+def record_data(side, duration):
+    global correct_circle_location, random_circle_index, interval, trial_count
+    print("correct") if correct_circle_location[random_circle_index] == side else print("wrong")
+
+    str_side = "Left" if side == 0 else "Right"
+    correct = correct_circle_location[random_circle_index] == side
+
+    data.append((trial_count, str_side, correct, duration, time.time()))
+    trial_count += 1
+    # print(data)
 
 
 if __name__ == "__main__":
@@ -107,7 +110,7 @@ if __name__ == "__main__":
     font50 = pygame.font.SysFont(None, 50)
     window.fill(black)
 
-    # Draw opaque rectandles for left and right sides
+    # Draw opaque rectangles for left and right sides
     leftRect = pygame.draw.rect(window, (0, 0, 0), (0, 0, 512, 768), 1)
     rightRect = pygame.draw.rect(window, (0, 0, 0), (512, 0, 512, 768), 1)
 
@@ -130,15 +133,18 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                with open(filename, 'w') as csvfile:
+                    csvwriter = csv.writer(csvfile)
+                    csvwriter.writerow(fields)
+                    csvwriter.writerows(data)
             if event.type == pygame.KEYDOWN:
                 pygame.event.clear()
                 if event.key == pygame.K_a:
-                    highlight_screen(leftRect, 0)
+                    record_data(0, time.time() - start_time)
+                    highlight_screen(leftRect)
                 if event.key == pygame.K_d:
-                    highlight_screen(rightRect, 1)
-
-                # Record the time taken and/or the unix time
-                print("time taken: " + str(time.time() - start_time))
+                    record_data(1, time.time() - start_time)
+                    highlight_screen(rightRect)
 
                 interval = random.randint(3000, 5000)
                 start_time = time.time()
