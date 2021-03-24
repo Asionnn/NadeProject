@@ -11,12 +11,19 @@ circle_list = []
 correct_circle_location = []
 fields = ['Trial #', 'Side', 'Correct?', 'Reaction Time', 'UNIX Time Stamp']
 black = [0, 0, 0]
+
 date = datetime.today().strftime('%y%m%d%H%M%S')
 filename = 'Data' + date + '.csv'
+
 circles = 0
 trial_count = 1
 random_circle_index = 0
+
+started_trials = False
 runOnce = True
+button_pressed = False
+
+end_button = pygame.Rect(974, 744, 50, 25)
 
 
 def generate_circle_lists():
@@ -65,11 +72,17 @@ def draw_rect_alpha(surface, color, rect):
     surface.blit(shape_surf, rect)
 
 
+def draw_selected_circles():
+    for x, y, r in circle_list[random_circle_index]:
+        pygame.draw.circle(window, (255, 255, 255), (round(x), round(y)), int(r), 1)
+
+
 def draw_circles():
-    global random_circle_index
+    global random_circle_index, end_button
     random_circle_index = random.randint(0, 100)
     for x, y, r in circle_list[random_circle_index]:
         pygame.draw.circle(window, (255, 255, 255), (round(x), round(y)), int(r), 1)
+    pygame.draw.rect(window, [255, 0, 0], end_button)
     pygame.display.flip()
 
 
@@ -84,7 +97,8 @@ def highlight_screen(rect):
     pygame.display.update()
     pygame.time.wait(100)
     draw_rect_alpha(window, (0, 0, 0), rect)
-    reset_circles()
+    draw_selected_circles()
+    pygame.draw.rect(window, [255, 0, 0], end_button)
 
 
 def record_data(side, duration):
@@ -115,20 +129,26 @@ if __name__ == "__main__":
     rightRect = pygame.draw.rect(window, (0, 0, 0), (512, 0, 512, 768), 1)
 
     # Render circles and set up interval
-    draw_circles()
+    if started_trials:
+        draw_circles()
     interval = random.randint(3000, 5000)
 
     # Keep track of the game time
     game_start_time = time.time()
     start_time = time.time()
 
+    # start button
+    start_button = pygame.Rect(462, 359, 100, 50)
+    pygame.draw.rect(window, [0, 255, 0], start_button)
+
     while run:
-        if (time.time() - start_time) * 1000 >= interval:
+        if (time.time() - start_time) * 1000 >= interval and started_trials:
             print("interval: " + str(interval))
             print("time: " + str(time.time() - start_time))
             interval = random.randint(3000, 5000)
             start_time = time.time()
             reset_circles()
+            button_pressed = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -137,17 +157,30 @@ if __name__ == "__main__":
                     csvwriter = csv.writer(csvfile)
                     csvwriter.writerow(fields)
                     csvwriter.writerows(data)
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and not button_pressed:
                 pygame.event.clear()
                 if event.key == pygame.K_a:
+                    button_pressed = True
                     record_data(0, time.time() - start_time)
                     highlight_screen(leftRect)
                 if event.key == pygame.K_d:
+                    button_pressed = True
                     record_data(1, time.time() - start_time)
                     highlight_screen(rightRect)
 
                 interval = random.randint(3000, 5000)
                 start_time = time.time()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = event.pos
+                if start_button.collidepoint(mouse_pos) and not started_trials:
+                    window.fill(black)
+                    pygame.display.flip()
+                    started_trials = True
+                    start_time = time.time()
+                    draw_circles()
+                if end_button.collidepoint(mouse_pos):
+                    print("TBA")
+
 
         pygame.display.flip()
 
