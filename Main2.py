@@ -10,7 +10,7 @@ data = []
 circle_list = []
 correct_circle_location = []
 fields = ['Trial #', 'Side', 'Correct?', 'Reaction Time', 'UNIX Time Stamp']
-black = [0, 0, 0]
+black = [65, 65, 65]
 
 date = datetime.today().strftime('%y%m%d%H%M%S')
 filename = 'Data' + date + '.csv'
@@ -72,14 +72,14 @@ def draw_rect_alpha(surface, color, rect):
 
 def draw_selected_circles():
     for x, y, r in circle_list[random_circle_index]:
-        pygame.draw.circle(window, (255, 255, 255), (round(x), round(y)), int(r), 1)
+        pygame.draw.circle(window, (0, 0, 0), (round(x), round(y)), int(r), 1)
 
 
 def draw_circles():
     global random_circle_index
     random_circle_index = random.randint(0, 100)
     for x, y, r in circle_list[random_circle_index]:
-        pygame.draw.circle(window, (255, 255, 255), (round(x), round(y)), int(r), 1)
+        pygame.draw.circle(window, (0, 0, 0), (round(x), round(y)), int(r), 1)
     pygame.display.flip()
 
 
@@ -93,7 +93,7 @@ def highlight_screen(rect):
     draw_rect_alpha(window, (100, 100, 100), rect)
     pygame.display.update()
     pygame.time.wait(100)
-    draw_rect_alpha(window, (0, 0, 0), rect)
+    draw_rect_alpha(window, (65, 65, 65), rect)
     draw_selected_circles()
 
 
@@ -121,8 +121,8 @@ if __name__ == "__main__":
     window.fill(black)
 
     # Draw opaque rectangles for left and right sides
-    leftRect = pygame.draw.rect(window, (0, 0, 0), (0, 0, 512, 768), 1)
-    rightRect = pygame.draw.rect(window, (0, 0, 0), (512, 0, 512, 768), 1)
+    leftRect = pygame.draw.rect(window, (65, 65, 65), (0, 0, 512, 768), 1)
+    rightRect = pygame.draw.rect(window, (65, 65, 65), (512, 0, 512, 768), 1)
 
     # Render circles and set up interval
     if started_trials:
