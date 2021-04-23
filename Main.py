@@ -121,13 +121,13 @@ if __name__ == "__main__":
     window.fill(black)
 
     # Draw opaque rectangles for left and right sides
-    leftRect = pygame.draw.rect(window, (0, 0, 0), (0, 0, 512, 768), 1)
-    rightRect = pygame.draw.rect(window, (0, 0, 0), (512, 0, 512, 768), 1)
+    leftRect = pygame.draw.rect(window, (0, 0, 0), (0, 0, 512, 768), 2)
+    rightRect = pygame.draw.rect(window, (0, 0, 0), (512, 0, 512, 768), 2)
 
     # Render circles and set up interval
     if started_trials:
         draw_circles()
-    interval = random.randint(3000, 5000)
+    interval = random.randint(10000, 15000)
 
     # Keep track of the game time
     game_start_time = time.time()
@@ -141,7 +141,10 @@ if __name__ == "__main__":
         if (time.time() - start_time) * 1000 >= interval and started_trials:
             print("interval: " + str(interval))
             print("time: " + str(time.time() - start_time))
-            interval = random.randint(3000, 5000)
+
+            data.append((trial_count, "N/A", False, "N/A", time.time()))
+            trial_count += 1
+            interval = random.randint(10000, 15000)
             start_time = time.time()
             reset_circles()
             button_pressed = False
@@ -173,7 +176,7 @@ if __name__ == "__main__":
                     record_data(1, time.time() - start_time)
                     highlight_screen(rightRect)
 
-                interval = random.randint(3000, 5000)
+                interval = random.randint(10000, 15000)
                 start_time = time.time()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = event.pos
